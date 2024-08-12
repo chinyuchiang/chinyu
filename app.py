@@ -221,7 +221,7 @@ def handle_message(event):
             for i in range(len(dataList)):
                 for k in range(len(dataList[i])):
                     look_stock_price(dataList[i][k]['favorite_stock'],dataList[i][k]['condition'],dataList[i][k]['price'],dataList[i][k]['userID'])
-        schedule.every(10).seconds.do(job).tag('daily-tasks-stock'+uid,'second')
+        schedule.every(5).seconds.do(job).tag('daily-tasks-stock'+uid,'second')
         while True :
             schedule.run_pending()
             time.sleep(1)
