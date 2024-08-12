@@ -14,6 +14,16 @@ from bs4 import BeautifulSoup
 from line_bot import *
 app = Flask(__name__)
 
+#抓使用者設定它關心的股票
+def cache_users_stock():
+    db=mongodb.contructur_stock()
+    nameList = db.list_collection_names()
+    users = []
+    for i in range(len(nameList)):
+        collect = db[nameList[i]]
+        cel = list(collect.find({"tag":"stock"}))
+        users.append(cel)
+    return users
 #油價查詢
 def oil_price():
     target_url = 'https://gas.goodlife.tw/'
@@ -116,6 +126,9 @@ def handle_message(event):
         content = Msg_Template.youtube_channel()
         line_bot_api.push_message(uid,content)
         return 0 
+    
+
+
     ################################股票區################################
     if event.message.text == "股價查詢":
         line_bot_api.push_message(uid,TextSendMessage("請輸入 #股票代號....."))
@@ -174,6 +187,44 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content)
         )            
+    ################################股票提醒################################
+    if re.match("關閉提醒",msg):
+        import schedule
+        schedule.clear()
+    if re.match("股價提醒",msg):
+        import schedule
+        import time
+        # 查看當前股價
+        def look_stock_price(stock,condition,price,userID):
+            print(userID)
+            url = 'http://tw.stock.yahoo.com/q/q?s=' + stock
+            list_req = request.get(url)
+            soup = BeautifulSoup(list_req.content,"html.parser")
+            getstock = soup.find('span',class_= 'Fz(32px)').string
+            content = stock + "當前股市價為: " + getstock
+            if condition == "<":
+                content += "\n篩選條件為: <"+ price
+                if float(getstock) < float*(price):
+                    content += "\n符合" +getstock + " < " + price + "的篩選項目"
+                    line_bot_api.push_message(userID,TextSendMessage(text=content))
+            elif condition == ">":
+                if float(getstock) > float*(price):
+                    content += "\n符合" +getstock + " > " + price + "的篩選項目"
+                    line_bot_api.push_message(userID,TextSendMessage(text=content))
+            elif condition == "=":
+                if float(getstock) > float*(price):
+                    content += "\n符合" +getstock + " > " + price + "的篩選項目"
+                    line_bot_api.push_message(userID,TextSendMessage(text=content))
+        def job():
+            print("HH")
+            dataList = cache_users_stock()
+            for i in range(len(dataList)):
+                for k in range(len(dataList[i])):
+                    look_stock_price(dataList[i][k]['favorite_stock'],dataList[i][k]['condition'],dataList[i][k]['price'],dataList[i][k]['userID'])
+        schedule.every(30).seconds.do(job).tag('daily-tasks-stock'+uid,'second')
+        while True :
+            schedule.run_pending()
+            time.sleep(1)
     ################################匯率區################################
     if re.match('幣別種類',msg):
         message = Msg_Template.show_Button()
