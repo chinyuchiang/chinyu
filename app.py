@@ -85,7 +85,7 @@ def handle_message(event):
     uid = profile.user_id
     user_name = profile.display_name #使用者名稱 
 
-    ##############################目錄區##############################
+    ############################## 目錄區 ##############################
     if event.message.text == "油價查詢":
         content = oil_price()
         line_bot_api.reply_message(
@@ -129,7 +129,7 @@ def handle_message(event):
     
 
 
-    ################################股票區################################
+    ################################ 股票區 ################################
     if event.message.text == "股價查詢":
         line_bot_api.push_message(uid,TextSendMessage("請輸入 #股票代號....."))
     #新增使用者關注的股票到mongodb EX:關注2330>XXX
@@ -187,7 +187,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content)
         )            
-    ################################股票提醒################################
+    ################################ 股票提醒 ################################
     if re.match("股價提醒", msg):
         import schedule
         import time
@@ -233,7 +233,7 @@ def handle_message(event):
         while True: 
             schedule.run_pending()
             time.sleep(1)
-    ################################匯率區################################
+    ################################ 匯率區 ################################
     if re.match('幣別種類',msg):
         message = Msg_Template.show_Button()
         line_bot_api.reply_message(event.reply_token,message)
@@ -284,6 +284,28 @@ def handle_message(event):
         content = mongodb.delete_my_currency(user_name,uid)
         line_bot_api.push_message(uid,TextSendMessage(content))
         return 0 
+################################ 匯率圖 ################################
+    if re.match("CT[A-Z]{3}",msg):
+        currency = msg[2:5] # 外幣代號
+        if EXRate.getCurrencyName(currency) == "無可支援的外幣":
+            line_bot_api.push_message(uid,TextSendMessage('無可支援的外幣'))
+            return 0 
+        line_bot_api.push_message(uid,TextSendMessage('稍等一下,將會給您匯率走勢圖'))
+        cash_imgurl = EXRate.cash_exrate_sixMonth(currency)
+        if cash_imgurl == "現金匯率無資料可分析":
+            line_bot_api.push_message(uid,TextSendMessage('現金匯率無資料可分析'))
+        else:
+            line_bot_api.push_message(uid,TextSendMessage(original_content_url=cash_imgurl,preview_image_url=cash_imgurl))
+
+        spot_imgurl = EXRate.spot_exrate_sixMonth(currency)
+        if spot_imgurl == "即期匯率無資料可分析":
+            line_bot_api.push_message(uid,TextMessage('即期匯率無資料可分析'))
+        else:
+            line_bot_api.push_message(uid,ImageSendMessage(original_content_url=cash_imgurl,preview_image_url=cash_imgurl))
+        btn_msg = Msg_Template.realtime_currency_other(currency)
+        line_bot_api.push_message(uid,btn_msg)
+        return 0 
+
 
 @handler.add(FollowEvent)
 def handler_follow(event):

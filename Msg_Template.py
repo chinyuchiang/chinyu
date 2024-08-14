@@ -519,6 +519,41 @@ def youtube_channel():
             }
         )
     return flex_message
+
+def realtime_currency_other(currency):
+    content = "想知道更多?"
+    text_message = TextSendMessage(
+                                text = content ,
+                               quick_reply=QuickReply(
+                                   items=[
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="即時匯率", 
+                                                    text="外幣"+currency,
+                                                )
+                                       ),
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="加入清單", 
+                                                    text="新增外幣"+currency,
+                                                )
+                                       ),
+                                        QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="走勢圖", 
+                                                    text="CT"+currency,
+                                                )
+                                       ),
+                                        QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="新聞", 
+                                                    text="N外匯"+currency,
+                                                )
+                                       )
+                                ]
+                            ))
+    return text_message
+
 # # 幣別種類Button
 # def show_Button():
 #     flex_message = FlexSendMessage(
