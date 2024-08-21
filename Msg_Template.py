@@ -22,6 +22,34 @@ def others():
                             ))
     return text_message
 
+def stock_reply_other():
+    content_text = "趨勢圖查詢"
+    text_message = TextSendMessage(
+                                text = content_text ,
+                               quick_reply=QuickReply(
+                                   items=[
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="即時股價", 
+                                                    text="股價查詢->#2330",
+                                                )
+                                       ),
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="匯率圖", 
+                                                    text="CT幣別->CTUSD",
+                                                )
+                                       ),
+                                        QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="股價k線圖", 
+                                                    text="@k股票代號日期區間->@k23302024-01-01",
+                                                )
+                                       ),
+                                       ]
+                            ))
+    return text_message
+
 def stock_reply_rate():
     content_text = "想知道匯率?"
     text_message = TextSendMessage(

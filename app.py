@@ -225,6 +225,9 @@ def handle_message(event):
         content = Msg_Template.youtube_channel()
         line_bot_api.push_message(uid, content)
         return 0
+    if re.match('趨勢圖查詢',msg):
+        message = Msg_Template.stock_reply_other()
+        line_bot_api.reply_message(event.reply_token,message)
     
     ############################### 股票區 ################################
     
