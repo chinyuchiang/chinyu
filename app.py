@@ -24,7 +24,9 @@ import pyimgur
 
 def plot_stock_k_chart(IMGUR_CLIENT_ID,stock='0050',date_from='2020-01-01'):
     """
-    
+    進行個股K線圖繪製，回傳至雲端圖床的連結，將顯示包含5MA、20MA及量價關係，起始預設自2020-01起到昨日收盤價。
+    :stock :個股代碼(字串)，預設0050。
+    :date_from :起始日(字串)，規格為YYYY-MM-DD，預設自2020-01-01起
     """
     stock = str(stock) + ".TW"
     try:
