@@ -22,7 +22,7 @@ import yfinance as yf
 import mplfinance as mpf
 import pyimgur
 
-def plot_stock_k_chart(IMGUR_CLIENT_ID,stock='0050',date_from='2020-01-01'):
+def plot_stock_k_chart(IMGUR_CLIENT_ID,stock="0050",date_from='2020-01-01'):
     """
     進行個股K線圖繪製，回傳至雲端圖床的連結，將顯示包含5MA、20MA及量價關係，起始預設自2020-01起到昨日收盤價。
     :stock :個股代碼(字串)，預設0050。
@@ -46,7 +46,8 @@ def plot_stock_k_chart(IMGUR_CLIENT_ID,stock='0050',date_from='2020-01-01'):
         im = pyimgur.Imgur(IMGUR_CLIENT_ID)
         uploaded_image = im.upload_image(PATH,title=stock + " canlestick chart")
         print(f"圖片上傳成功: {uploaded_image.link}")
-        return uploaded_image.link_big_square
+        return uploaded_image.link
+    
     except Exception as e:
         print(f"錯誤 {e}")
         return None
