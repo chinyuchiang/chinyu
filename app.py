@@ -270,10 +270,6 @@ def handle_message(event):
                                 uri='https://stocks.ddns.net/'
                             ),
                             URIAction(
-                                label='巴班論壇',
-                                uri='https://mikeon88.666forum.com/f1-forum'
-                            ),
-                            URIAction(
                                 label='巴菲特班講稿',
                                 uri='http://mikeon88.blogspot.com/2018/08/121.html'
                             ),
