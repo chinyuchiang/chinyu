@@ -16,6 +16,38 @@ import mongodb
 import twder
 
 app = Flask(__name__)
+IMGUR_CLIENT_ID = "9dcefb81aaea882"
+
+import yfinance as yf
+import mplfinance as mpf
+import pyimgur
+
+def plot_stock_k_chart(IMGUR_CLIENT_ID,stock='0050',date_from='2020-01-01'):
+    """
+    
+    """
+    stock = str(stock) + ".TW"
+    try:
+        #使用yfinance獲取數據
+        print(f"正在獲取股票數據: {stock}")
+        df = yf.download(stock,start=date_from)
+
+        #檢查數據是否獲取成功
+        if df is None or df.empty:
+            print(f"未成獲取到股票數據，可能因爲股票代碼不正確或數據來源問題。")
+            return None
+        print("股票數據獲取成功，開始繪製K線圖")
+        mpf.plot(df,type='candle',mav=(5,20),volume=True,ylabel=stock.upper()+' Price',savefig='testsave.png')
+
+        #上傳圖片到Imgur
+        PATH = "testsave.png"
+        im = pyimgur.Imgur(IMGUR_CLIENT_ID)
+        uploaded_image = im.upload_image(PATH,title=stock + " canlestick chart")
+        print(f"圖片上傳成功: {uploaded_image.link}")
+        return uploaded_image.link_big_square
+    except Exception as e:
+        print(f"錯誤 {e}")
+        return None
 
 # 抓使用者設定它關心的匯率
 def cache_users_currency():
@@ -244,8 +276,14 @@ def handle_message(event):
         content = mongodb.delete_my_allstock( user_name, uid)
         line_bot_api.push_message(uid, TextSendMessage(content))
         return 0
-    
-    
+    ################################ K線圖 ##########################################
+    if event.message.text[:2].upper() == "@k": #這段主要在畫k線圖
+        input_word = event.message.text.replace(" ","") #合併字串取消空白
+        stock_name = input_word[2:6] # 2330
+        start_date = input_word[6:]  # 2024-08-21
+        content = plot_stock_k_chart(IMGUR_CLIENT_ID,stock_name,start_date)
+        message = ImageSendMessage(original_content_url=content,preview_image_url=content)
+        line_bot_api.reply_message(event.reply_tocken,message)
     ################################ 目錄區 ##########################################
     if event.message.text == "油價查詢":
         content = oil_price()
