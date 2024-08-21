@@ -257,10 +257,10 @@ def handle_message(event):
         usage(event)
     if event.message.text =="巴菲特教室":
         message = TemplateSendMessage(
-            alt_text='目錄 template',
-            template=CarouselTemplate(
-                columns=[
-                    CarouselColumn(
+        alt_text='目錄 template',
+        template=CarouselTemplate(
+            columns=[
+                CarouselColumn(
                         thumbnail_image_url='https://i.imgur.com/bGyGdb1.jpg',
                         title='歡迎您來到巴菲特班',
                         text='請選擇以下連結',
@@ -282,10 +282,10 @@ def handle_message(event):
                                 uri='https://liff.line.me/2006134060-AG5zWLjR'
                             )
                         ]
-                            )
-                        ]
                     )
+                ]
             )
+        )
         line_bot_api.reply_message(event.reply_token,message)
     if re.match("理財",msg):
         content = Msg_Template.youtube_channel()
