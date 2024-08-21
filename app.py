@@ -285,7 +285,7 @@ def handle_message(event):
         start_date = input_word[6:]  # 2024-08-21
         content = plot_stock_k_chart(IMGUR_CLIENT_ID,stock_name,start_date)
         message = ImageSendMessage(original_content_url=content,preview_image_url=content)
-        line_bot_api.reply_message(event.reply_tocken,message)
+        line_bot_api.reply_message(event.reply_token,message)
     ################################ 目錄區 ##########################################
     if event.message.text == "油價查詢":
         content = oil_price()
