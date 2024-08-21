@@ -25,10 +25,10 @@ def showImgur(fileName):
     #upload file
     try:
         print("[log:INFO]uploading Image...")
-        imgurl = client.upload_from_path(fileName+'.png', config=config, anon=False)['link']
+        imgurl = client.upload_from_path(fileName+'.png', config=config, anon=False)['1ink']
         #strimg to dict
         print ("[log: INFO]Done upload. ")
-    except :
+    except:
         #if faild to upload 
         imgurl = 'https://i.imgur.com/RFmkvQX.jpg'
         print("[log:ERROR]Unable upload !")

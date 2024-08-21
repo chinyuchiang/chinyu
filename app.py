@@ -27,15 +27,15 @@ def cache_users_currency():
         cel = list(collect.find({"tag":'currency'}))
         users.append(cel)
     return users
-def Usage(event):
-    push_msg(event,"    🌟🌟 查詢方法 🌟🌟   \
-                    \n\
-                    \n☢本機器人可查詢油價及匯率☢\
-                    \n\
-                    \n⑥ 油價通知 ➦➦➦ 輸入油價報你知\
-                    \n⑥ 匯率通知 ➦➦➦ 輸入查詢匯率\
-                    \n⑦ 匯率兌換 ➦➦➦ 換匯USD/TWD\
-                    \n⑦ 自動推播 ➦➦➦ 自動推播")
+
+def usage(event):
+    push_msg(event,"   ★ ★  查詢方法  ★ ★   \
+             \n\
+             \n⊕本機器人可查詢股票、匯率及油價等等...⊕\
+             \n\
+             \n◎ 油價通知 →→→→ 請輸入油價查詢\
+             \n◎ 匯率通知 →→→→ 請輸入匯率查詢\
+             \n◎ 匯率兌換 →→→→ 請輸入換匯USD/TWD/$$$")
 # 監聽所有來自 /callback 的 Post Request
 def push_msg(event,msg):
     try:
@@ -111,6 +111,10 @@ def handle_message(event):
     if re.match('幣別種類',msg):
         message = Msg_Template.show_Button()
         line_bot_api.reply_message(event.reply_token,message)
+    if re.match("其他功能",msg):
+        btn_msg = Msg_Template.others()
+        line_bot_api.push_message(uid, btn_msg)
+        return 0   
     if re.match('新增外幣[A-Z]{3}', msg):
         currency = msg[4:7]
         currency_name = EXRate.getCurrencyName(currency)
@@ -169,14 +173,14 @@ def handle_message(event):
             line_bot_api.push_message(uid, TextSendMessage(content))
         return 0
     ######################## 使用說明 選單 油價查詢################################
-    if event.message.text == "油價報你知":
+    if event.message.text == "油價查詢":
         content = oil_price()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=content))
         return 0
     if event.message.text == "使用說明":
-        Usage(event)
+        usage(event)
         print(user_name)
     if re.match("理財YOUTUBER推薦", msg):
         content = Msg_Template.youtube_channel()
@@ -243,72 +247,50 @@ def handle_message(event):
     
     
     ################################ 目錄區 ##########################################
-    if event.message.text == "開始玩":
+    if event.message.text == "油價查詢":
+        content = oil_price()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=content))
+        return 0
+    if event.message.text == "使用說明":
+        usage(event)
+    if event.message.text =="巴菲特教室":
         message = TemplateSendMessage(
-        alt_text='目錄 template',
-        template=CarouselTemplate(
-            columns=[
-                CarouselColumn(
+            alt_text='目錄 template',
+            template=CarouselTemplate(
+                columns=[
+                    CarouselColumn(
                         thumbnail_image_url='https://i.imgur.com/bGyGdb1.jpg',
-                        title='選擇服務',
-                        text='請選擇',
+                        title='歡迎您來到巴菲特班',
+                        text='請選擇以下連結',
                         actions=[
-                            MessageAction(
-                                label='開始玩',
-                                text='開始玩'
+                            URIAction(
+                                label='網頁盈再表',
+                                uri='https://stocks.ddns.net/'
                             ),
                             URIAction(
-                                label='財經新聞',
-                                uri='https://tw.stock.yahoo.com/news/'
+                                label='巴班論壇',
+                                uri='https://mikeon88.666forum.com/f1-forum'
                             ),
                             URIAction(
-                                label='粉絲團',
-                                uri='https://zh-tw.facebook.com/lccnet10/'
+                                label='巴菲特班講稿',
+                                uri='http://mikeon88.blogspot.com/2018/08/121.html'
+                            ),
+                            URIAction(
+                                label='巴班論壇LIFF',
+                                uri='https://liff.line.me/2006134060-AG5zWLjR'
                             )
                         ]
-                    ),
-                CarouselColumn(
-                        thumbnail_image_url='https://i.imgur.com/N9TKsay.jpg',
-                        title='選擇服務',
-                        text='請選擇',
-                        actions=[
-                            MessageAction(
-                                label='other bot',
-                                text='imgur bot'
-                            ),
-                            MessageAction(
-                                label='油價查詢',
-                                text='油價查詢'
-                            ),
-                            URIAction(
-                                label='奇摩股市',
-                                uri='https://tw.stock.yahoo.com/us/?s=NVS&tt=1'
-                            )
-                        ]
-                    ),
-                CarouselColumn(
-                        thumbnail_image_url='https://i.imgur.com/rwR2yUr.jpg',
-                        title='選擇服務',
-                        text='請選擇',
-                        actions=[
-                            URIAction(
-                                label='匯率分享',
-                                uri='https://rate.bot.com.tw/xrt?Lang=zh-TW'
-                            ),
-                            URIAction(
-                                label='財經PTT',
-                                uri='https://www.ptt.cc/bbs/Finance/index.html'
-                            ),
-                            URIAction(
-                                label='youtube 程式教學分享頻道',
-                                uri='https://www.youtube.com/channel/UCPhn2rCqhu0HdktsFjixahA'
                             )
                         ]
                     )
-                ]
             )
-        )
-        line_bot_api.reply_message(event.reply_token, message)
+        line_bot_api.reply_message(event.reply_token,message)
+    if re.match("理財",msg):
+        content = Msg_Template.youtube_channel()
+        line_bot_api.push_message(uid,content)
+        return 0 
     
     if re.match("股價提醒", msg):
         import schedule

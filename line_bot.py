@@ -6,7 +6,7 @@ from linebot.exceptions import (
 )
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, StickerSendMessage, FollowEvent, UnfollowEvent,
-    TemplateSendMessage,CarouselTemplate,CarouselColumn,URIAction
+    TemplateSendMessage,CarouselTemplate,CarouselColumn,URIAction,ImageSendMessage
 )
 # CHANNEL_ACCESS_TOKEN
 line_bot_api = LineBotApi('zQIbXL3LKpmEfDPfpdK3tpSv6xQ3mDsislvgROljfJhOLf147UBGbIW0ZqWCQsKGLnMzd4m/9GhyN7TnaCJ5gtfJe9+/qfE9BS4UfODMqEgH5fG/9m7KQ1+x8+VT0zLKZvFF7dDZZnhVqJOQtAGQVAdB04t89/1O/w1cDnyilFU=')
