@@ -412,7 +412,7 @@ def handle_message(event):
             time.sleep(1)
     ############################################### weather ######################################
     if re.match('最新氣象｜查詢天氣｜天氣查詢｜weather｜Weather',msg):
-        content-place.img_Carousel()
+        content=place.img_Carousel()
         line_bot_api.reply_message(event.reply_token,content)
         return 0 
     ############################################### 即時天氣-ok ######################################
