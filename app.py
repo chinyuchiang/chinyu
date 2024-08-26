@@ -15,6 +15,7 @@ import EXRate
 import mongodb
 import twder
 import json,time
+import place
 
 app = Flask(__name__)
 IMGUR_CLIENT_ID = "9dcefb81aaea882"
@@ -22,7 +23,7 @@ access_token = "zQIbXL3LKpmEfDPfpdK3tpSv6xQ3mDsislvgROljfJhOLf147UBGbIW0ZqWCQsKG
 import yfinance as yf
 import mplfinance as mpf
 import pyimgur
-
+mat_d={}
 
 
 def plot_stock_k_chart(IMGUR_CLIENT_ID,stock = "0050",date_from='2020-01-01'):
@@ -409,7 +410,18 @@ def handle_message(event):
         while True: 
             schedule.run_pending()
             time.sleep(1)
-    ################################################匯率推播#######################################
+    ############################################### weather ######################################
+    if re.match('最新氣象｜查詢天氣｜天氣查詢｜weather｜Weather',msg):
+        content-place.img_Carousel()
+        line_bot_api.reply_message(event.reply_token,content)
+        return 0 
+    ############################################### 即時天氣-ok ######################################
+    if re.match('即時天氣｜即時氣象',msg):
+        mat_d[uid]='即時天氣'
+        content=place.quick_reply_weather(mat_d[uid])
+        line_bot_api.reply_message(event.reply_token,content)
+        return 0
+    ############################################### 匯率推播 ######################################
     if re.match("匯率推播", msg):
         import schedule
         import time
