@@ -14,10 +14,11 @@ import Msg_Template
 import EXRate
 import mongodb
 import twder
+import json,time
 
 app = Flask(__name__)
 IMGUR_CLIENT_ID = "9dcefb81aaea882"
-
+access_token = "zQIbXL3LKpmEfDPfpdK3tpSv6xQ3mDsislvgROljfJhOLf147UBGbIW0ZqWCQsKGLnMzd4m/9GhyN7TnaCJ5gtfJe9+/qfE9BS4UfODMqEgH5fG/9m7KQ1+x8+VT0zLKZvFF7dDZZnhVqJOQtAGQVAdB04t89/1O/w1cDnyilFU="
 import yfinance as yf
 import mplfinance as mpf
 import pyimgur
@@ -83,7 +84,18 @@ def push_msg(event,msg):
     except:
         room_id = event.source.room_id
         line_bot_api.push_message(room_id,TextSendMessage(text=msg))
-
+def reply_image(msg, rk, token):
+    headers = {'Authorization':f'Bearer {token}','Content-Type':'application/json'}
+    body = {
+    'replyToken':rk,
+    'messages':[{
+          'type': 'image',
+          'originalContentUrl': msg,
+          'previewImageUrl': msg
+        }]
+    }
+    req = requests.request('POST','https://api.line.me/v2/bot/message/reply',headers=headers,data=json.dumps(body).encode('utf-8'))
+    print(req.text)
 # 抓使用者設定它關心的股票
 def cache_users_stock():
     db=mongodb.constructor_stock()
@@ -118,12 +130,28 @@ def callback():
     body = request.get_data(as_text=True)
     app.logger.info("Request body: " + body)
 
+
+
     # handle webhook body
     try:
         handler.handle(body, signature)
-    except InvalidSignatureError:
-        abort(400)
-
+        # 轉換內容為json格式
+        json_data = json.loads(body)
+        # 取得回傳訊息的Token (reply mseeage 使用)
+        reply_token = json_data['events'][0]['replyToken']
+        # 取得使用者 ID (push message 使用)
+        user_id = json_data['events'][0]['source']['userId']
+        print(json_data)
+        if 'message' in json_data['events'][0]:
+            if json_data['events'][0]['message']['type'] == 'text':
+                # 取出文字
+                text = json_data['events'][0]['message']['text']
+                # 如果是雷達回波圖相關的文字
+                if text == '雷達回波圖' or text == '雷達回波':
+                    #傳送雷達回波圖
+                    reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png?{time.time_ns()}',reply_token,access_token)
+    except :
+        print('error')
     return 'OK'
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
