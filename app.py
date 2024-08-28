@@ -70,7 +70,7 @@ def cache_users_currency():
     return users
 
 def usage(event):
-    push_msg(event,"   ★ ★  查詢方法  ★ ★   \
+    push_msg(event,"   ⭐ ⭐  使用方法  ⭐ ⭐   \
              \n📌Jarvis機器人提供股價、油價、匯率查詢\
              \n📌另外也有提供股票投資相關論壇、影片\
              \n📌問題反應 ➤ mailto:chinyuc1993@gmail.com\
