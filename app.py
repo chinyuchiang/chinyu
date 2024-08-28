@@ -84,8 +84,8 @@ def usage(event):
              \n可以依條件設定欲關注的股票\
              \n當股價符合條件時發送推播通知\
              \n▌ 匯率查詢\
-             \n請輸入換匯USD/JPY/$$$
-             \nEX.USD/JPY/100
+             \n請輸入換匯USD/JPY/$$$\
+             \nEX.USD/JPY/100\
              \n▌ 趨勢圖查詢\
              \n輸入【CT】+3碼幣別\
              \nEX.CTUSD\
