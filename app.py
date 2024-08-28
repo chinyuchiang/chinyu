@@ -41,6 +41,7 @@ def preprocess_image(image):
     image = image / 255.0
     image = np.expend_dims(image,axis=0)
     image = np.expend_dims(image,axis=-1)
+    return image
 
 def plot_stock_k_chart(IMGUR_CLIENT_ID,stock = "0050",date_from='2020-01-01'):
     """
