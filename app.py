@@ -36,7 +36,7 @@ def preprocess_image(image):
     預處理上傳的圖像，使其符合CNN模型的輸入要求
     """
     image = image.convert('L')
-    image = image.resizq((28,28))
+    image = image.resize((28,28))
     image = np.array(image)
     image = image / 255.0
     image = np.expend_dims(image,axis=0)
