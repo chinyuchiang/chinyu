@@ -72,8 +72,9 @@ def cache_users_currency():
 def usage(event):
     push_msg(event,"   ★ ★  查詢方法  ★ ★   \
              \n\
-             \n📌Jarvis機器人提供股價、油價、匯率查詢📌\
-             \n📌另外也有提供股票投資相關論壇、影片📌\
+             \n📌Jarvis機器人提供股價、油價、匯率查詢\
+             \n📌另外也有提供股票投資相關論壇、影片\
+             \n📌問題反應 ➤ mailto:chinyuc1993@gmail.com\
              \n\
              \n⚠️建議您使用六宮格操作更加方便快速⚠️\
              \n▌ 股價查詢 ➤ #2330\
