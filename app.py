@@ -337,8 +337,6 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=content))
         return 0
-    if event.message.text == "使用說明":
-        usage(event)
     if event.message.text =="巴菲特教室":
         message = TemplateSendMessage(
         alt_text='目錄 template',
