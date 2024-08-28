@@ -16,6 +16,10 @@ import mongodb
 import twder
 import json,time
 import place
+import numpy as np
+from tensorflow.keras.models import load_model
+from PIL import Image
+import io
 
 app = Flask(__name__)
 IMGUR_CLIENT_ID = "9dcefb81aaea882"
@@ -24,7 +28,19 @@ import yfinance as yf
 import mplfinance as mpf
 import pyimgur
 mat_d={}
-
+    ######################## CNN ##############################################  
+model = load_model('mnist_cnn_model.h5')
+line_bot_api = LineBotApi("zQIbXL3LKpmEfDPfpdK3tpSv6xQ3mDsislvgROljfJhOLf147UBGbIW0ZqWCQsKGLnMzd4m/9GhyN7TnaCJ5gtfJe9+/qfE9BS4UfODMqEgH5fG/9m7KQ1+x8+VT0zLKZvFF7dDZZnhVqJOQtAGQVAdB04t89/1O/w1cDnyilFU=")
+def preprocess_image(image):
+    """
+    預處理上傳的圖像，使其符合CNN模型的輸入要求
+    """
+    image = image.convert('L')
+    image = image.resizq((28,28))
+    image = np.array(image)
+    image = image / 255.0
+    image = np.expend_dims(image,axis=0)
+    image = np.expend_dims(image,axis=-1)
 
 def plot_stock_k_chart(IMGUR_CLIENT_ID,stock = "0050",date_from='2020-01-01'):
     """
@@ -57,7 +73,22 @@ def plot_stock_k_chart(IMGUR_CLIENT_ID,stock = "0050",date_from='2020-01-01'):
     except Exception as e:
         print(f"錯誤: {e}")
         return None
-
+#圖像辨識
+@handler.add(MessageEvent,message=ImageMessage)
+def handle_image_message(event):
+    #獲取圖片內容
+    message_content = line_bot_api.get_message_content(event.message.id)
+    image = Image.open(io.BytesIO(message_content.content))
+    #預處理圖片
+    image = preprocess_image(image)
+    #執行CNN模型進行預測
+    prediction = model.predict(image)
+    digit = np.argmax(prediction)
+    #回傳預測結果
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=f'預測的數字是:{digit}')
+    )
 # 抓使用者設定它關心的匯率
 def cache_users_currency():
     db=mongodb.constructor_currency()
@@ -149,30 +180,28 @@ def callback():
 
     # get request body as text
     body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
-
-
+    app.logger.info(f"Request body: {body}")
 
     # handle webhook body
     try:
-        handler.handle(body, signature)
+        handler.handle(body, signature)   
         # 轉換內容為json格式
-        json_data = json.loads(body)
+        # json_data = json.loads(body)
         # 取得回傳訊息的Token (reply mseeage 使用)
-        reply_token = json_data['events'][0]['replyToken']
+        # reply_token = json_data['events'][0]['replyToken']
         # 取得使用者 ID (push message 使用)
-        user_id = json_data['events'][0]['source']['userId']
-        print(json_data)
-        if 'message' in json_data['events'][0]:
-            if json_data['events'][0]['message']['type'] == 'text':
-                # 取出文字
-                text = json_data['events'][0]['message']['text']
-                # 如果是雷達回波圖相關的文字
-                if text == '雷達回波圖' or text == '雷達回波':
-                    #傳送雷達回波圖
-                    reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png?{time.time_ns()}',reply_token,access_token)
-    except :
-        print('error')
+        # user_id = json_data['events'][0]['source']['userId']
+        # print(json_data)
+        # if 'message' in json_data['events'][0]:
+            # if json_data['events'][0]['message']['type'] == 'text':
+            #     # 取出文字
+            #     text = json_data['events'][0]['message']['text']
+            #     # 如果是雷達回波圖相關的文字
+            #     if text == '雷達回波圖' or text == '雷達回波':
+            #         #傳送雷達回波圖
+            #         reply_image(f'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png?{time.time_ns()}',reply_token,access_token)
+    except InvalidSignatureError:
+        abort(400)
     return 'OK'
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
@@ -185,7 +214,7 @@ def handle_message(event):
     usespeak=str(event.message.text) #使用者講的話
     uid = profile.user_id #使用者ID
     user_name = profile.display_name #使用者名稱
-    
+
     ######################## 匯率區 ##############################################    
     if re.match("匯率大小事", msg):
         btn_msg = Msg_Template.stock_reply_rate()
@@ -277,7 +306,32 @@ def handle_message(event):
     if re.match('趨勢圖查詢',msg):
         message = Msg_Template.stock_reply_other()
         line_bot_api.reply_message(event.reply_token,message)
-    
+    ############################### CNN ################################
+    msg = event.message.text
+
+    if re.match('圖像辨識',msg):
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text='請上傳一張圖片進行圖像辨識。')
+        )
+    if re.match('雷達回波',msg):
+        url = 'https://www.cwa.gov.tw/Data/radar/CV1_3600.png'
+        radar_img = ImageSendMessage(
+            original_cotent_url=url,
+            preview_image_url=url
+        )
+        line_bot_api.reply_message(event.reply_token,radar_img)
+    ############################################### weather ######################################
+    if re.match('最新氣象|查詢天氣|天氣查詢|weather|Weather',msg):
+        content=place.img_Carousel()
+        line_bot_api.reply_message(event.reply_token,content)
+        return 0 
+    ############################################### 即時天氣-ok ######################################
+    if re.match('即時天氣|即時氣象',msg):
+        mat_d[uid]='即時天氣'
+        content=place.quick_reply_weather(mat_d[uid])
+        line_bot_api.reply_message(event.reply_token,content)
+        return 0
     ############################### 股票區 ################################
     
     if re.match('關注[0-9]{4}[<>][0-9]' ,msg):
@@ -428,17 +482,6 @@ def handle_message(event):
         while True: 
             schedule.run_pending()
             time.sleep(1)
-    ############################################### weather ######################################
-    if re.match('最新氣象|查詢天氣|天氣查詢|weather|Weather',msg):
-        content=place.img_Carousel()
-        line_bot_api.reply_message(event.reply_token,content)
-        return 0 
-    ############################################### 即時天氣-ok ######################################
-    if re.match('即時天氣|即時氣象',msg):
-        mat_d[uid]='即時天氣'
-        content=place.quick_reply_weather(mat_d[uid])
-        line_bot_api.reply_message(event.reply_token,content)
-        return 0
     ############################################### 匯率推播 ######################################
     if re.match("匯率推播", msg):
         import schedule
